@@ -1,0 +1,16 @@
+[package]
+name = "mcp-agent"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+toml = "0.8.23"
+serde = { version = "1.0.219", features = ["derive"] }
+rmcp = { git = "https://github.com/modelcontextprotocol/rust-sdk", branch = "main", features = ["server", "transport-sse-server", "transport-io", "client",
+    "transport-sse-client",
+    "reqwest",
+    "transport-streamable-http-client",
+    "transport-child-process",
+    "tower",
+    "auth"] }
+tokio = { version = "1.45.1", features = ["full"] }
