@@ -42,3 +42,4 @@ target/
 
 *.lfs*
 
+**/mcp-config.toml
