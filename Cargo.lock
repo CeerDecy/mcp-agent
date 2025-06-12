@@ -1621,6 +1621,7 @@ name = "simple"
 version = "0.1.0"
 dependencies = [
  "mcp-agent",
+ "tokio",
 ]
 
 [[package]]
