@@ -1,6 +1,4 @@
-pub struct LLM {
-    
-}
+pub struct LLM {}
 
 impl LLM {
     pub fn new() -> Self {

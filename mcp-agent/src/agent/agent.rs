@@ -37,6 +37,10 @@ impl Agent {
         agent.initialize_mcp(&config).await;
         agent
     }
+    
+    pub async fn send(&self,content: &str) {
+        println!("Sending mcp command {}", content);
+    }
 
     async fn initialize_mcp(&mut self, config: &Config) {
         println!("Initializing MCP clients...");

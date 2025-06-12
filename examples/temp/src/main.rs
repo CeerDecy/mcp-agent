@@ -21,11 +21,11 @@ async fn main() {
     // mcp_client().await;
 
     // streamable_client().await;
-    
+
     // openai().await;
 
-    let s = mcp_agent::mcp_server::server::Server::new();
-    s.start();
+    let s = mcp_agent::mcp_server::server::Server::new().await;
+    s.start().await;
 
     let config = mcp_agent::agent::Config::from_file("mcp-config.toml");
     let agent = mcp_agent::agent::Agent::new_with_config(config);

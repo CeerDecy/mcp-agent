@@ -28,7 +28,7 @@ pub struct McpConfig {
 impl Config {
     pub fn from_file(filepath: &str) -> Config {
         let content = fs::read_to_string(filepath).expect("Could not read config file");
-        
+
         toml::from_str(&content).expect("Could not parse config file")
     }
 }

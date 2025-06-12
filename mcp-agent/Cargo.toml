@@ -14,3 +14,4 @@ rmcp = { git = "https://github.com/modelcontextprotocol/rust-sdk", branch = "mai
     "tower",
     "auth"] }
 tokio = { version = "1.45.1", features = ["full"] }
+axum.workspace = true
