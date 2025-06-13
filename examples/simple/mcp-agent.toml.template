@@ -1,0 +1,14 @@
+[mcp_servers.searxng]
+command = "uvx"
+args = ["mcp-searxng"]
+[mcp_servers.searxng.env]
+SEARXNG_URL = "https://searxng.example.com"
+
+[mcp_servers.fetch]
+command = "uvx"
+args = ["mcp-server-fetch", "--ignore-robots-txt"]
+
+[llm]
+api_key = "your_api_key"
+base_url = "https://api.openai.com/v1/"
+model = "gpt-4.1"

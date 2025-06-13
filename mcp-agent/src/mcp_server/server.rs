@@ -22,7 +22,7 @@ pub struct Server {
 
 impl Server {
     pub async fn new() -> Self {
-        let agent = Arc::new(Agent::new_with_config(Config::from_file("mcp-config.toml")).await);
+        let agent = Arc::new(Agent::new_with_config(Config::from_file("mcp-agent.toml")).await);
         Self { agent }
     }
 
