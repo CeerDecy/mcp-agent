@@ -10,8 +10,8 @@ rmcp = { git = "https://github.com/modelcontextprotocol/rust-sdk", branch = "mai
     "transport-sse-client",
     "reqwest",
     "transport-streamable-http-client",
+    "transport-streamable-http-server",
     "transport-child-process",
-    "tower",
     "auth"] }
 tokio = { version = "1.45.1", features = ["full"] }
 axum.workspace = true

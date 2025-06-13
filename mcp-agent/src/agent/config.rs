@@ -1,6 +1,6 @@
 use serde::Deserialize;
 use std::collections::HashMap;
-use std::fs;
+use std::{env, fs};
 
 #[derive(Debug, Deserialize)]
 pub struct Config {
@@ -27,7 +27,7 @@ pub struct McpConfig {
 
 impl Config {
     pub fn from_file(filepath: &str) -> Config {
-        let content = fs::read_to_string(filepath).expect("Could not read config file");
+        let content = fs::read_to_string(filepath).expect(format!("could not read config file: {}", filepath).as_str());
 
         toml::from_str(&content).expect("Could not parse config file")
     }

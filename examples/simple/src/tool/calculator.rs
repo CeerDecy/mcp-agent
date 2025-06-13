@@ -1,8 +1,10 @@
 use mcp_agent::agent::Agent;
-use rmcp::model::CallToolResult;
+use rmcp::model::{AnnotateAble, CallToolResult, GetPromptRequestParam, GetPromptResult, Implementation, InitializeRequestParam, InitializeResult, ListPromptsResult, ListResourceTemplatesResult, ListResourcesResult, PaginatedRequestParam, Prompt, PromptArgument, PromptMessage, PromptMessageContent, PromptMessageRole, ProtocolVersion, RawResource, ReadResourceRequestParam, ReadResourceResult, Resource, ResourceContents, ServerCapabilities, ServerInfo};
 use rmcp::model::Content;
-use rmcp::{Error as McpError, schemars, tool, ServerHandler};
+use rmcp::{Error as McpError, schemars, tool, ServerHandler, RoleServer};
 use std::sync::Arc;
+use rmcp::service::RequestContext;
+use serde_json::json;
 
 #[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
 pub struct StructRequest {
@@ -22,6 +24,10 @@ impl Calculator {
         Self { agent }
     }
 
+    fn _create_resource_text(&self, uri: &str, name: &str) -> Resource {
+        RawResource::new(uri, name.to_string()).no_annotation()
+    }
+
     #[tool(description = "Calculate the sum of two numbers")]
     pub async fn calculate(
         &self,
@@ -34,8 +40,41 @@ impl Calculator {
             (a + b).to_string(),
         )]))
     }
+
+    #[tool(description = "Increment the counter by 1")]
+    async fn increment(&self) -> Result<CallToolResult, McpError> {
+        self.agent.send("hhhhhhhhhhh").await;
+        // let mut counter = self.counter.lock().await;
+        // *counter += 1;
+        Ok(CallToolResult::success(vec![Content::text(
+            // counter.to_string(),
+            "success".to_string(),
+        )]))
+    }
 }
 
+#[tool(tool_box)]
 impl ServerHandler for Calculator {
-    
+    fn get_info(&self) -> ServerInfo {
+        ServerInfo {
+            protocol_version: ProtocolVersion::V_2024_11_05,
+            capabilities: ServerCapabilities::builder()
+                // .enable_prompts()
+                // .enable_resources()
+                .enable_tools()
+                .build(),
+            server_info: Implementation::from_build_env(),
+            instructions: Some("This mcp_server provides a counter tool that can increment and decrement values. The counter starts at 0 and can be modified using the 'increment' and 'decrement' tools. Use 'get_value' to check the current count.".to_string()),
+        }
+    }
+
+    async fn initialize(
+        &self,
+        _request: InitializeRequestParam,
+        context: RequestContext<RoleServer>,
+    ) -> Result<InitializeResult, McpError> {
+        if let Some(http_request_part) = context.extensions.get::<axum::http::request::Parts>() {
+        }
+        Ok(self.get_info())
+    }
 }
