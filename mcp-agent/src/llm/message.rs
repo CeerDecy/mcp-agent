@@ -1,8 +1,7 @@
 use async_openai::types::{
     ChatCompletionMessageToolCall, ChatCompletionRequestAssistantMessageArgs,
     ChatCompletionRequestMessage, ChatCompletionRequestSystemMessageArgs,
-    ChatCompletionRequestToolMessageArgs,
-    ChatCompletionRequestUserMessageArgs,
+    ChatCompletionRequestToolMessageArgs, ChatCompletionRequestUserMessageArgs,
 };
 use serde::{Deserialize, Serialize};
 
@@ -44,6 +43,19 @@ impl Conversation {
         self.messages.push(
             ChatCompletionRequestSystemMessageArgs::default()
                 .content(content)
+                .build()
+                .unwrap()
+                .into(),
+        )
+    }
+
+    pub fn append_tool_call_response(
+        &mut self,
+        tool_calls: &Vec<ChatCompletionMessageToolCall>,
+    ) {
+        self.messages.push(
+            ChatCompletionRequestAssistantMessageArgs::default()
+                .tool_calls(tool_calls.clone())
                 .build()
                 .unwrap()
                 .into(),

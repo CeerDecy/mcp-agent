@@ -1,10 +1,13 @@
 use mcp_agent::agent::Agent;
-use rmcp::model::{AnnotateAble, CallToolResult, GetPromptRequestParam, GetPromptResult, Implementation, InitializeRequestParam, InitializeResult, ListPromptsResult, ListResourceTemplatesResult, ListResourcesResult, PaginatedRequestParam, Prompt, PromptArgument, PromptMessage, PromptMessageContent, PromptMessageRole, ProtocolVersion, RawResource, ReadResourceRequestParam, ReadResourceResult, Resource, ResourceContents, ServerCapabilities, ServerInfo};
+use mcp_agent::llm::message::Conversation;
 use rmcp::model::Content;
-use rmcp::{Error as McpError, schemars, tool, ServerHandler, RoleServer};
-use std::sync::Arc;
+use rmcp::model::{
+    AnnotateAble, CallToolResult, Implementation, InitializeRequestParam, InitializeResult,
+    ProtocolVersion, RawResource, Resource, ServerCapabilities, ServerInfo,
+};
 use rmcp::service::RequestContext;
-use serde_json::json;
+use rmcp::{Error as McpError, RoleServer, ServerHandler, schemars, tool};
+use std::sync::Arc;
 
 #[derive(Debug, serde::Deserialize, schemars::JsonSchema)]
 pub struct StructRequest {
@@ -33,23 +36,24 @@ impl Calculator {
         &self,
         #[tool(aggr)] StructRequest { a, b }: StructRequest,
     ) -> Result<CallToolResult, McpError> {
-        
-        self.agent.send("hello ceerdecy").await;
-        
-        Ok(CallToolResult::success(vec![Content::text(
-            (a + b).to_string(),
-        )]))
+        let mut conversation = Conversation::new(4096);
+        conversation.append_user_content("how many tools you can call? json format response: {\"data\":data}".to_string());
+
+        let resp = self.agent.send(&mut conversation).await.unwrap();
+
+        Ok(CallToolResult::success(vec![
+            Content::text((a + b).to_string()),
+            Content::text(resp),
+        ]))
     }
 
     #[tool(description = "Increment the counter by 1")]
     async fn increment(&self) -> Result<CallToolResult, McpError> {
-        self.agent.send("hhhhhhhhhhh").await;
-        // let mut counter = self.counter.lock().await;
-        // *counter += 1;
-        Ok(CallToolResult::success(vec![Content::text(
-            // counter.to_string(),
-            "success".to_string(),
-        )]))
+        let mut conversation = Conversation::new(4096);
+        conversation.append_user_content("how many tools you can call? json format response: {\"data\":data}".to_string());
+        
+        let resp = self.agent.send(&mut conversation).await.unwrap();
+        Ok(CallToolResult::success(vec![Content::text(resp)]))
     }
 }
 
@@ -73,8 +77,9 @@ impl ServerHandler for Calculator {
         _request: InitializeRequestParam,
         context: RequestContext<RoleServer>,
     ) -> Result<InitializeResult, McpError> {
-        if let Some(http_request_part) = context.extensions.get::<axum::http::request::Parts>() {
-        }
+        _ = context;
+        // if let Some(http_request_part) = context.extensions.get::<axum::http::request::Parts>() {
+        // }
         Ok(self.get_info())
     }
 }

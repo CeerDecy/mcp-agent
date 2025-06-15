@@ -100,6 +100,7 @@ impl Agent {
             .unwrap()
             .send(conversation.clone())
             .await;
+
         if response.tool_calls.is_none() {
             let message = response.conversation.messages.last().unwrap();
             if let Assistant(msg) = message {
@@ -110,6 +111,8 @@ impl Agent {
             return Ok("success".to_string());
         }
         let toolcalls = response.tool_calls.unwrap();
+        conversation.append_tool_call_response(&toolcalls);
+
         self.handle_tool_calls(toolcalls, conversation).await?;
 
         Box::pin(self.send_llm(conversation)).await
@@ -230,15 +233,17 @@ impl Agent {
             let name: String = call.function.name;
             let arguments: String = call.function.arguments;
 
-            if let Some(client) = self.tools_clients.get(&name){
-                let result = client.call_tool(CallToolRequestParam {
-                    name: name.into(),
-                    arguments: serde_json::json!(arguments).as_object().cloned(),
-                }).await?;
+            if let Some(client) = self.tools_clients.get(&name) {
+                let result = client
+                    .call_tool(CallToolRequestParam {
+                        name: name.into(),
+                        arguments: serde_json::json!(arguments).as_object().cloned(),
+                    })
+                    .await?;
 
                 let resp = serde_json::to_string(&result)?;
 
-                conversation.append_tool_call_content(resp,call.id);
+                conversation.append_tool_call_content(resp, call.id);
             }
         }
 
