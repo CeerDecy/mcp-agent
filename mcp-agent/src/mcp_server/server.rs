@@ -14,8 +14,6 @@ const SSE_PATH: &str = "/sse";
 const MESSAGE_PATH: &str = "/message";
 const STREAMABLE_PATH: &str = "/mcp";
 
-type Option  = dyn Fn();
-
 pub struct Server {
     agent: Arc<Agent>,
 }

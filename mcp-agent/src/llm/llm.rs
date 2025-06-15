@@ -1,7 +1,7 @@
-pub struct LLM {}
+use async_trait::async_trait;
+use crate::llm::message::{ChatResponse, Conversation};
 
-impl LLM {
-    pub fn new() -> Self {
-        Self {}
-    }
+#[async_trait]
+pub trait LLM: Send + Sync {
+    async fn send(&self, conversation: Conversation) -> ChatResponse;
 }
