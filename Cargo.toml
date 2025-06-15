@@ -1,5 +1,5 @@
 [workspace]
-members = [ "examples/*","mcp-agent"]
+members = [ "mcp-agent" ]
 resolver = "2"
 
 [workspace.dependencies]
