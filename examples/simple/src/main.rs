@@ -1,7 +1,7 @@
 mod tool;
 
 use mcp_agent::mcp_server::server::Server;
-use tool::calculator::Calculator;
+use tool::tool::Tool;
 
 #[tokio::main]
 async fn main() {
@@ -9,5 +9,5 @@ async fn main() {
 
     let addr = "0.0.0.0:8080";
     println!("Starting SSE server on {}", addr);
-    server.handle_sse(addr, Calculator::new).await.unwrap();
+    server.handle_sse(addr, Tool::new).await.unwrap();
 }
