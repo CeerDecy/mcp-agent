@@ -2,10 +2,7 @@ use crate::llm::llm::LLM;
 use crate::llm::message::{ChatResponse, Conversation};
 use async_openai::Client;
 use async_openai::config::OpenAIConfig;
-use async_openai::types::{
-    ChatCompletionTool,
-    CreateChatCompletionRequestArgs, ResponseFormat,
-};
+use async_openai::types::{ChatCompletionTool, CreateChatCompletionRequestArgs, ResponseFormat};
 use async_trait::async_trait;
 
 const BASE_URL: &str = "https://api.openai.com/v1";
@@ -59,15 +56,14 @@ impl OpenAi {
 #[async_trait]
 impl LLM for OpenAi {
     async fn send(&self, conversation: Conversation) -> ChatResponse {
-        let request =
-            CreateChatCompletionRequestArgs::default()
-                .max_tokens(conversation.max_tokens)
-                .model(&self.model)
-                .messages(conversation.messages.clone())
-                .tools(self.tools.clone())
-                .response_format(ResponseFormat::JsonObject)
-                .build()
-                .unwrap();
+        let request = CreateChatCompletionRequestArgs::default()
+            .max_tokens(conversation.max_tokens)
+            .model(&self.model)
+            .messages(conversation.messages.clone())
+            .tools(self.tools.clone())
+            .response_format(ResponseFormat::JsonObject)
+            .build()
+            .unwrap();
 
         let response = self
             .client

@@ -1,9 +1,9 @@
 use crate::agent::{Agent, Config};
-use rmcp::transport::{stdio, SseServer};
+use rmcp::transport::sse_server::SseServerConfig;
 use rmcp::transport::streamable_http_server::{
     StreamableHttpService, session::local::LocalSessionManager,
 };
-use rmcp::transport::sse_server::SseServerConfig;
+use rmcp::transport::{SseServer, stdio};
 use rmcp::{RoleServer, Service, ServiceExt};
 use std::io::Error;
 use std::sync::Arc;
@@ -63,20 +63,23 @@ impl Server {
         println!("ctrl-c received!");
         Ok(())
     }
-    
-    pub async fn handle_streamable<S,F>(&mut self, addr: &str,service_provider: F)  -> Result<(), Error>
+
+    pub async fn handle_streamable<S, F>(
+        &mut self,
+        addr: &str,
+        service_provider: F,
+    ) -> Result<(), Error>
     where
         S: Service<RoleServer>,
         F: Fn(Arc<Agent>) -> S + Send + Sync + 'static,
     {
-
         let service_provider = Arc::new(service_provider);
         let agent = self.agent.clone();
         let provider = {
             let service_provider = service_provider.clone();
             move || service_provider(agent.clone())
         };
-        
+
         let service = StreamableHttpService::new(
             provider,
             LocalSessionManager::default().into(),
@@ -91,10 +94,10 @@ impl Server {
         Ok(())
     }
 
-    pub async fn handle_stdio<S,F>(&mut self,service_provider: F)  -> Result<(), Error>
+    pub async fn handle_stdio<S, F>(&mut self, service_provider: F) -> Result<(), Error>
     where
         S: Service<RoleServer>,
-        F: Fn(Arc<Agent>) -> S + Send + Sync + 'static, 
+        F: Fn(Arc<Agent>) -> S + Send + Sync + 'static,
     {
         let service_provider = Arc::new(service_provider);
         let agent = self.agent.clone();
@@ -102,11 +105,15 @@ impl Server {
             let service_provider = service_provider.clone();
             move || service_provider(agent.clone())
         };
-        
-        provider().serve(stdio()).await.inspect_err(|e| {
-            println!("stdio error: {}", e);
-        }).unwrap();
-        
+
+        provider()
+            .serve(stdio())
+            .await
+            .inspect_err(|e| {
+                println!("stdio error: {}", e);
+            })
+            .unwrap();
+
         Ok(())
     }
 }

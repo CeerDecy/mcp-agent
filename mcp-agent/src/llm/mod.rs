@@ -1,3 +1,3 @@
 pub mod llm;
-pub mod openai;
 pub mod message;
+pub mod openai;

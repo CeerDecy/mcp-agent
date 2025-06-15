@@ -49,10 +49,7 @@ impl Conversation {
         )
     }
 
-    pub fn append_tool_call_response(
-        &mut self,
-        tool_calls: &Vec<ChatCompletionMessageToolCall>,
-    ) {
+    pub fn append_tool_call_response(&mut self, tool_calls: &Vec<ChatCompletionMessageToolCall>) {
         self.messages.push(
             ChatCompletionRequestAssistantMessageArgs::default()
                 .tool_calls(tool_calls.clone())
