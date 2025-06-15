@@ -6,7 +6,7 @@ description = "A Model Context Protocol (MCP) agent implementation in Rust"
 license = "MIT"
 repository = "https://github.com/CeerDecy/mcp-agent"
 readme = "README.md"
-keywords = ["mcp", "agent", "ai", "protocol", "llm", "openai"]
+keywords = ["mcp", "agent", "protocol", "llm", "openai"]
 categories = ["api-bindings", "network-programming"]
 
 [dependencies]
