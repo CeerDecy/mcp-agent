@@ -14,16 +14,23 @@ const SSE_PATH: &str = "/sse";
 const MESSAGE_PATH: &str = "/message";
 const STREAMABLE_PATH: &str = "/mcp";
 
+/// Represents a server that handles different types of MCP transport protocols
 pub struct Server {
     agent: Arc<Agent>,
 }
 
 impl Server {
+    /// Creates a new server instance with configuration from mcp-agent.toml
     pub async fn new() -> Self {
         let agent = Arc::new(Agent::new_with_config(Config::from_file("mcp-agent.toml")).await);
         Self { agent }
     }
 
+    /// Handles Server-Sent Events (SSE) transport protocol
+    /// 
+    /// # Arguments
+    /// * `addr` - The address to bind the server to
+    /// * `service_provider` - A function that creates a service instance for the agent
     pub async fn handle_sse<S, F>(&mut self, addr: &str, service_provider: F) -> Result<(), Error>
     where
         S: Service<RoleServer>,
@@ -64,6 +71,11 @@ impl Server {
         Ok(())
     }
 
+    /// Handles streamable HTTP transport protocol
+    /// 
+    /// # Arguments
+    /// * `addr` - The address to bind the server to
+    /// * `service_provider` - A function that creates a service instance for the agent
     pub async fn handle_streamable<S, F>(
         &mut self,
         addr: &str,
@@ -94,6 +106,10 @@ impl Server {
         Ok(())
     }
 
+    /// Handles standard I/O transport protocol
+    /// 
+    /// # Arguments
+    /// * `service_provider` - A function that creates a service instance for the agent
     pub async fn handle_stdio<S, F>(&mut self, service_provider: F) -> Result<(), Error>
     where
         S: Service<RoleServer>,

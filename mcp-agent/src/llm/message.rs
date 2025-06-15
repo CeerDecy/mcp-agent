@@ -5,6 +5,7 @@ use async_openai::types::{
 };
 use serde::{Deserialize, Serialize};
 
+/// Represents a conversation with a list of messages and maximum token limit
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Conversation {
     pub messages: Vec<ChatCompletionRequestMessage>,
@@ -12,6 +13,7 @@ pub struct Conversation {
 }
 
 impl Conversation {
+    /// Creates a new empty conversation with specified maximum tokens
     pub fn new(max_tokens: u32) -> Self {
         Self {
             messages: Vec::new(),
@@ -19,16 +21,19 @@ impl Conversation {
         }
     }
 
+    /// Creates a new conversation with a system prompt and maximum tokens
     pub fn new_with_prompt(max_tokens: u32, system_prompt: String) -> Self {
         let mut conversation = Self::new(max_tokens);
         conversation.append_system_content(system_prompt);
         conversation
     }
 
+    /// Appends a raw message to the conversation
     pub fn append_message(&mut self, message: ChatCompletionRequestMessage) {
         self.messages.push(message);
     }
 
+    /// Appends a user message with the given content
     pub fn append_user_content(&mut self, content: String) {
         self.messages.push(
             ChatCompletionRequestUserMessageArgs::default()
@@ -39,6 +44,7 @@ impl Conversation {
         )
     }
 
+    /// Appends a system message with the given content
     pub fn append_system_content(&mut self, content: String) {
         self.messages.push(
             ChatCompletionRequestSystemMessageArgs::default()
@@ -49,6 +55,7 @@ impl Conversation {
         )
     }
 
+    /// Appends an assistant message with tool calls
     pub fn append_tool_call_response(&mut self, tool_calls: &Vec<ChatCompletionMessageToolCall>) {
         self.messages.push(
             ChatCompletionRequestAssistantMessageArgs::default()
@@ -59,6 +66,7 @@ impl Conversation {
         )
     }
 
+    /// Appends an assistant message with the given content
     pub fn append_assistant_content(&mut self, content: String) {
         self.messages.push(
             ChatCompletionRequestAssistantMessageArgs::default()
@@ -69,6 +77,7 @@ impl Conversation {
         )
     }
 
+    /// Appends a tool message with content and tool ID
     pub fn append_tool_call_content(&mut self, content: String, tool_id: String) {
         self.messages.push(
             ChatCompletionRequestToolMessageArgs::default()
@@ -81,12 +90,14 @@ impl Conversation {
     }
 }
 
+/// Represents a response from the chat model, including the conversation and optional tool calls
 pub struct ChatResponse {
     pub conversation: Conversation,
     pub tool_calls: Option<Vec<ChatCompletionMessageToolCall>>,
 }
 
 impl ChatResponse {
+    /// Creates a new chat response with the given conversation
     pub fn new(conversation: Conversation) -> Self {
         Self {
             conversation,

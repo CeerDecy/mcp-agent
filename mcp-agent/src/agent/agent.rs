@@ -26,6 +26,7 @@ use std::string::String;
 use std::sync::Arc;
 use tokio::process::Command;
 
+/// Represents an agent that manages MCP clients and LLM interactions
 pub struct Agent {
     config: Config,
     mcp_clients: HashMap<String, McpClient>,
@@ -33,13 +34,18 @@ pub struct Agent {
     llm_client: Option<Arc<dyn LLM>>,
 }
 
+/// Enum representing different types of MCP clients
 enum McpClient {
+    /// Client using standard I/O communication
     StdioClient(Arc<RunningService<RoleClient, ()>>),
+    /// Client using Server-Sent Events (SSE) communication
     SseClient(Arc<RunningService<RoleClient, InitializeRequestParam>>),
+    /// Client using streamable HTTP communication
     StreamableClient(Arc<RunningService<RoleClient, InitializeRequestParam>>),
 }
 
 impl McpClient {
+    /// Lists available tools from the MCP client
     async fn list_tools(&self) -> Result<ListToolsResult, Box<dyn Error>> {
         match self {
             McpClient::StdioClient(client) => {
@@ -57,6 +63,7 @@ impl McpClient {
         }
     }
 
+    /// Calls dependence tool with the MCP client
     async fn call_tool(
         &self,
         request_param: CallToolRequestParam,
@@ -74,6 +81,7 @@ const STDIO_TRANSPORT: &str = "stdio";
 const SSE_TRANSPORT: &str = "sse";
 
 impl Agent {
+    /// Creates a new agent with the configuration
     pub async fn new_with_config(config: Config) -> Self {
         println!("Starting MCP agent");
         let mut agent = Agent {
@@ -88,10 +96,12 @@ impl Agent {
         agent
     }
 
+    /// Sends a conversation to the LLM and returns the response
     pub async fn send(&self, conversation: &mut Conversation) -> Result<String, Box<dyn Error>> {
         self.send_llm(conversation).await
     }
 
+    /// Internal method to send conversation to LLM and handle tool calls
     async fn send_llm(&self, conversation: &mut Conversation) -> Result<String, Box<dyn Error>> {
         println!("Sending mcp command {:?}", conversation);
         let response = self
@@ -118,6 +128,7 @@ impl Agent {
         Box::pin(self.send_llm(conversation)).await
     }
 
+    /// Initializes the agent by setting up MCP and LLM clients
     pub async fn initialize(&mut self) {
         self.initialize_mcp()
             .await
@@ -134,6 +145,7 @@ impl Agent {
             .unwrap();
     }
 
+    /// Initializes the LLM client with configuration
     async fn initialize_llm(&mut self) -> Result<(), Box<dyn Error>> {
         let mut llm = OpenAi::new();
         llm.with_options(vec![
@@ -156,6 +168,7 @@ impl Agent {
         Ok(())
     }
 
+    /// Initializes MCP clients based on configuration
     async fn initialize_mcp(&mut self) -> Result<(), Box<dyn Error>> {
         println!("Initializing MCP clients...");
         for (name, mcp_config) in &self.config.mcp_servers {
@@ -200,6 +213,8 @@ impl Agent {
         }
         Ok(())
     }
+
+    /// Lists all available tools from MCP clients and build Vec<ChatCompletionTool>
     async fn list_tools(&mut self) -> Result<Vec<ChatCompletionTool>, Box<dyn Error>> {
         let mut res = Vec::new();
         for (_, client) in &self.mcp_clients {
@@ -224,6 +239,7 @@ impl Agent {
         Ok(res)
     }
 
+    /// Handles tool calls from the LLM response
     async fn handle_tool_calls(
         &self,
         toolcalls: Vec<ChatCompletionMessageToolCall>,
@@ -255,6 +271,7 @@ impl Agent {
     }
 }
 
+/// Converts a JsonObject to a serde_json Value
 fn convert_json_object(obj: Arc<JsonObject>) -> Option<Value> {
     let option_value = match Arc::try_unwrap(obj) {
         Ok(json_obj) => Some(Value::Object(json_obj)),
@@ -262,6 +279,8 @@ fn convert_json_object(obj: Arc<JsonObject>) -> Option<Value> {
     };
     option_value
 }
+
+/// Initializes a stdio-based MCP client
 async fn initialize_stdio_client(
     name: &str,
     config: &McpConfig,
@@ -286,6 +305,7 @@ async fn initialize_stdio_client(
     Ok(client)
 }
 
+/// Initializes a streamable HTTP-based MCP client
 async fn initialize_streamable_client(
     name: &str,
     config: &McpConfig,
@@ -317,6 +337,7 @@ async fn initialize_streamable_client(
     Ok(client)
 }
 
+/// Initializes an SSE-based MCP client
 async fn initialize_sse_client(
     name: &str,
     config: &McpConfig,

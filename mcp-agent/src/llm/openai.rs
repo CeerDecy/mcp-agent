@@ -7,6 +7,7 @@ use async_trait::async_trait;
 
 const BASE_URL: &str = "https://api.openai.com/v1";
 
+/// Represents an OpenAI client for handling chat completions
 #[derive(Debug)]
 pub struct OpenAi {
     api_key: String,
@@ -18,6 +19,7 @@ pub struct OpenAi {
 }
 
 impl OpenAi {
+    /// Creates a new instance of OpenAi with default values
     pub fn new() -> Self {
         Self {
             api_key: Default::default(),
@@ -29,17 +31,21 @@ impl OpenAi {
         }
     }
 
+    /// Applies a single configuration option to the OpenAi instance
     pub fn with_option(&mut self, opt: OpenAiOption) -> &Self {
         opt(self);
         self
     }
 
+    /// Applies multiple configuration options to the OpenAi instance
     pub fn with_options(&mut self, opts: Vec<OpenAiOption>) -> &Self {
         for func in opts {
             func(self);
         }
         self
     }
+
+    /// Builds the OpenAi client with the configured settings
     pub fn build(&mut self) -> &Self {
         let config = OpenAIConfig::new()
             .with_api_key(self.api_key.clone())
@@ -55,6 +61,7 @@ impl OpenAi {
 
 #[async_trait]
 impl LLM for OpenAi {
+    /// Sends a conversation to OpenAI and returns the chat response
     async fn send(&self, conversation: Conversation) -> ChatResponse {
         let request = CreateChatCompletionRequestArgs::default()
             .max_tokens(conversation.max_tokens)
@@ -99,21 +106,25 @@ impl LLM for OpenAi {
 
 type OpenAiOption = Box<dyn FnOnce(&mut OpenAi)>;
 
+/// Creates an option to set the API key
 pub fn with_api_key(api_key: &str) -> OpenAiOption {
     let api_key = api_key.to_string();
     Box::new(move |openai| openai.api_key = api_key)
 }
 
+/// Creates an option to set the model name
 pub fn with_model(model: &str) -> OpenAiOption {
     let model = model.to_string();
     Box::new(move |openai| openai.model = model)
 }
 
+/// Creates an option to set the base URL
 pub fn with_base_url(base_url: &str) -> OpenAiOption {
     let base_url = base_url.trim_matches('/').to_string();
     Box::new(move |openai| openai.base_url = base_url)
 }
 
+/// Creates an option to set the tools for chat completion
 pub fn with_tools(tools: Vec<ChatCompletionTool>) -> OpenAiOption {
     Box::new(move |openai| openai.tools = tools)
 }
