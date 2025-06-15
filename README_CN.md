@@ -101,7 +101,7 @@ mcp-agent/
 
 1. 克隆仓库：
    ```bash
-   git clone https://github.com/yourusername/mcp-agent.git
+   git clone https://github.com/CeerDecy/mcp-agent.git
    cd mcp-agent
    ```
 
