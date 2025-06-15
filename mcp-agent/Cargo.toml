@@ -2,11 +2,17 @@
 name = "mcp-agent"
 version = "0.1.0"
 edition = "2024"
+description = "A Model Context Protocol (MCP) agent implementation in Rust"
+license = "MIT"
+repository = "https://github.com/CeerDecy/mcp-agent"
+readme = "README.md"
+keywords = ["mcp", "agent", "ai", "protocol", "llm", "openai"]
+categories = ["api-bindings", "network-programming"]
 
 [dependencies]
 toml = "0.8.23"
 serde = { version = "1.0.219", features = ["derive"] }
-rmcp = { git = "https://github.com/modelcontextprotocol/rust-sdk", branch = "main", features = ["server", "transport-sse-server", "transport-io", "client",
+rmcp = { version = "0.1.5", features = ["server", "transport-sse-server", "transport-io", "client",
     "transport-sse-client",
     "reqwest",
     "transport-streamable-http-client",

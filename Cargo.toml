@@ -5,7 +5,7 @@ resolver = "2"
 [workspace.dependencies]
 async-openai = "0.28.3"
 axum = "0.8.4"
-rmcp = { git = "https://github.com/modelcontextprotocol/rust-sdk", branch = "main", features = ["server", "transport-sse-server", "transport-io", "client",
+rmcp = { version = "0.1.5", features = ["server", "transport-sse-server", "transport-io", "client",
     "transport-sse-client",
     "reqwest",
     "transport-streamable-http-client",
