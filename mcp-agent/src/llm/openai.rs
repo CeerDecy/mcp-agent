@@ -80,7 +80,7 @@ impl LLM for OpenAi {
             .unwrap();
 
         println!("Sending response {:?}", &response);
-        
+
         let mut resp = ChatResponse::new(conversation.clone());
 
         for choice in response.choices {
@@ -96,7 +96,7 @@ impl LLM for OpenAi {
                 }
             }
         }
-        
+
         resp
     }
 }

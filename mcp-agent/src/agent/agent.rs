@@ -232,12 +232,14 @@ impl Agent {
         for call in toolcalls {
             let name: String = call.function.name;
             let arguments: String = call.function.arguments;
-
+            
+            println!("deal tool call: {}, arguments: {:?}", &name, arguments );
+            
             if let Some(client) = self.tools_clients.get(&name) {
                 let result = client
                     .call_tool(CallToolRequestParam {
                         name: name.into(),
-                        arguments: serde_json::json!(arguments).as_object().cloned(),
+                        arguments: serde_json::from_str::<Value>(&arguments)?.as_object().cloned() ,
                     })
                     .await?;
 
